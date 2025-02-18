@@ -108,13 +108,13 @@ $currentUser = $auth->getCurrentUser();
                     <?php else: ?>
                         <li class="nav-item">
                             <button class="btn btn-sm btn-link nav-link p-2" onclick="showLoginModal()">
-                                <i class="bi bi-box-arrow-in-right"></i>
+                                <i class="bi bi-box-arrow-in-right fs-5"></i>
                                 <span class="d-lg-none ms-2">Giriş</span>
                             </button>
                         </li>
                         <li class="nav-item">
-                            <button class="btn btn-sm btn-primary rounded-pill px-3 py-1" onclick="showRegisterModal()">
-                                <i class="bi bi-person-plus"></i>
+                            <button class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1" onclick="showRegisterModal()">
+                                <i class="bi bi-person-plus fs-5"></i>
                                 <span class="d-lg-none ms-2">Kayıt Ol</span>
                             </button>
                         </li>
@@ -188,6 +188,27 @@ $currentUser = $auth->getCurrentUser();
 
 .navbar .nav-link:hover {
     color: var(--primary-color);
+}
+
+/* Giriş/Kayıt Butonları */
+.navbar .btn-link.nav-link {
+    color: var(--text-color);
+    transition: all 0.2s ease;
+}
+
+.navbar .btn-link.nav-link:hover {
+    color: var(--primary-color);
+    transform: translateY(-1px);
+}
+
+.navbar .btn-outline-primary {
+    border-width: 1.5px;
+    transition: all 0.2s ease;
+}
+
+.navbar .btn-outline-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(var(--primary-rgb), 0.2);
 }
 
 /* Mobil Menü */
