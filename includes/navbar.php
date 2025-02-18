@@ -13,6 +13,59 @@ $currentUser = $auth->getCurrentUser();
             <span class="brand-text">Kılıbık Erkekler</span>
         </a>
 
+        <!-- Arama Formu -->
+        <form class="d-none d-lg-flex search-form ms-4 me-auto" action="/search.php" method="GET">
+            <div class="input-group">
+                <input type="search" name="q" class="form-control search-input" 
+                       placeholder="Başlıklarda ara..." aria-label="Arama">
+                <button class="btn btn-filter" type="button" data-bs-toggle="collapse" 
+                        data-bs-target="#searchFilters" aria-expanded="false">
+                    <i class="bi bi-funnel"></i>
+                </button>
+                <button class="btn btn-search" type="submit">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+            <!-- Filtreler -->
+            <div class="collapse position-absolute search-filters" id="searchFilters">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="mb-3">Arama Filtreleri</h6>
+                        <div class="mb-3">
+                            <label class="form-label">Tarih Aralığı</label>
+                            <select name="date" class="form-select form-select-sm">
+                                <option value="">Tümü</option>
+                                <option value="today">Bugün</option>
+                                <option value="week">Bu Hafta</option>
+                                <option value="month">Bu Ay</option>
+                                <option value="year">Bu Yıl</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Sıralama</label>
+                            <select name="sort" class="form-select form-select-sm">
+                                <option value="relevant">İlgili</option>
+                                <option value="newest">En Yeni</option>
+                                <option value="oldest">En Eski</option>
+                                <option value="popular">Popüler</option>
+                            </select>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input type="checkbox" class="form-check-input" id="includeComments" name="comments">
+                            <label class="form-check-label" for="includeComments">Yorumlarda ara</label>
+                        </div>
+                        <div class="text-end">
+                            <button type="reset" class="btn btn-sm btn-link">Sıfırla</button>
+                            <button type="button" class="btn btn-sm btn-primary" 
+                                    data-bs-toggle="collapse" data-bs-target="#searchFilters">
+                                Uygula
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
         <!-- Yeni Başlık Butonu (Masaüstü) -->
         <a href="/submit.php" class="btn btn-primary rounded-pill px-4 py-2 d-none d-lg-flex align-items-center new-topic-btn ms-4">
             <i class="bi bi-plus-lg me-2"></i>
@@ -280,6 +333,101 @@ $currentUser = $auth->getCurrentUser();
         border: none;
         padding: 0;
         margin: 0;
+        box-shadow: none;
+    }
+}
+
+/* Arama Formu Stilleri */
+.search-form {
+    position: relative;
+    max-width: 600px;
+    width: 100%;
+}
+
+.search-input {
+    border-radius: 20px 0 0 20px;
+    border: 1px solid var(--border-color);
+    padding-left: 1rem;
+    background-color: var(--input-bg);
+    color: var(--text-color);
+}
+
+.search-input:focus {
+    box-shadow: none;
+    border-color: var(--primary-color);
+    background-color: var(--input-bg);
+}
+
+.btn-filter, .btn-search {
+    border: 1px solid var(--border-color);
+    background-color: var(--input-bg);
+    color: var(--text-color);
+}
+
+.btn-filter {
+    border-left: none;
+    border-right: none;
+    padding: 0.375rem 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.btn-filter:hover, .btn-filter[aria-expanded="true"] {
+    background-color: var(--hover-bg);
+    color: var(--primary-color);
+    transform: rotate(-15deg);
+}
+
+.btn-search {
+    border-radius: 0 20px 20px 0;
+    padding: 0.375rem 1rem;
+    transition: all 0.2s ease;
+}
+
+.btn-search:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #fff;
+}
+
+/* Filtre Paneli */
+.search-filters {
+    top: 100%;
+    right: 0;
+    width: 280px;
+    margin-top: 0.5rem;
+    z-index: 1000;
+}
+
+.search-filters .card {
+    border: 1px solid var(--border-color);
+    background-color: var(--navbar-bg);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.search-filters .form-label {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+.search-filters .form-select, 
+.search-filters .form-check-label {
+    font-size: 0.875rem;
+}
+
+/* Mobil Arama */
+@media (max-width: 991.98px) {
+    .offcanvas .search-form {
+        margin: 1rem 0;
+        max-width: none;
+    }
+    
+    .offcanvas .search-filters {
+        position: static;
+        width: 100%;
+        margin-top: 1rem;
+    }
+    
+    .offcanvas .search-filters .card {
         box-shadow: none;
     }
 }
