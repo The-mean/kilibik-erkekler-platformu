@@ -114,18 +114,16 @@ $currentUser = $auth->getCurrentUser();
                             </button>
                         </li>
                     <?php else: ?>
-                        <li class="nav-item">
-                            <a class="nav-link d-flex align-items-center" href="/login.php">
-                                <i class="bi bi-box-arrow-in-right me-2"></i>
-                                <span>Giriş Yap</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link d-flex align-items-center" href="/register.php">
-                                <i class="bi bi-person-plus me-2"></i>
-                                <span>Kayıt Ol</span>
-                            </a>
-                        </li>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-outline-primary" onclick="showLoginModal()">
+                                <i class="bi bi-box-arrow-in-right"></i>
+                                <span class="d-none d-md-inline ms-1">Giriş Yap</span>
+                            </button>
+                            <button type="button" class="btn btn-primary" onclick="showRegisterModal()">
+                                <i class="bi bi-person-plus"></i>
+                                <span class="d-none d-md-inline ms-1">Kayıt Ol</span>
+                            </button>
+                        </div>
                     <?php endif; ?>
                 </ul>
             </div>

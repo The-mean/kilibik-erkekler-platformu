@@ -221,5 +221,12 @@ if (preg_match('/^\/baslik\/(\d+)-([^\/]+)/', $currentPath, $matches)) {
     </div>
     
     <?= $adManager->getAdCode('mobile') ?>
+
+<?php require_once __DIR__ . '/modals.php'; ?>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/timeago.js@4.0.2/dist/timeago.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/timeago.js@4.0.2/dist/timeago.locales.min.js"></script>
+<script src="/assets/js/main.js"></script>
 </body>
 </html> 

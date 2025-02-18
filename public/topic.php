@@ -182,39 +182,17 @@ $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <?php if ($auth->isLoggedIn()): ?>
                 <div class="card-body">
                     <h5 class="card-title mb-3">Yorum Yap</h5>
-                    <form id="commentForm" onsubmit="submitComment(event)">
-                        <input type="hidden" name="topic_id" value="<?= $topic['id'] ?>">
-                        <input type="hidden" name="parent_id" id="parentCommentId" value="">
-                        
-                        <div class="mb-3">
-                            <textarea class="form-control" name="content" id="commentContent" 
-                                      rows="3" required minlength="5" 
-                                      placeholder="Yorumunuzu yazın..."></textarea>
-                            <div class="invalid-feedback">
-                                Yorum en az 5 karakter olmalıdır.
-                            </div>
-                        </div>
-                        
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div id="replyingTo" class="text-muted" style="display: none;">
-                                <small>
-                                    <i class="bi bi-reply"></i> 
-                                    <span></span>
-                                    <button type="button" class="btn btn-link btn-sm p-0 ms-2" onclick="cancelReply()">
-                                        <i class="bi bi-x"></i>
-                                    </button>
-                                </small>
-                            </div>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-send"></i> Gönder
-                            </button>
-                        </div>
-                    </form>
+                    <button type="button" class="btn btn-primary w-100" onclick="showCommentModal(<?= $topic['id'] ?>)">
+                        <i class="bi bi-chat-dots me-2"></i>Yorum Yaz
+                    </button>
                 </div>
                 <?php else: ?>
                 <div class="alert alert-info">
-                    Yorum yapabilmek için <a href="/login.php">giriş yapın</a> veya 
-                    <a href="/register.php">kayıt olun</a>.
+                    <p class="mb-0">
+                        Yorum yapabilmek için 
+                        <a href="#" onclick="showLoginModal()">giriş yapın</a> veya 
+                        <a href="#" onclick="showRegisterModal()">kayıt olun</a>.
+                    </p>
                 </div>
                 <?php endif; ?>
                 
@@ -267,8 +245,9 @@ $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             <?php endif; ?>
                                             <?php if ($auth->isLoggedIn()): ?>
                                             <li>
-                                                <button class="dropdown-item" onclick="reportComment(<?= $comment['id'] ?>)">
-                                                    <i class="bi bi-flag me-2"></i>Şikayet Et
+                                                <button class="dropdown-item" onclick="showCommentModal(<?= $topic['id'] ?>, <?= $comment['id'] ?>)">
+                                                    <i class="bi bi-reply"></i>
+                                                    <span class="ms-1">Yanıtla</span>
                                                 </button>
                                             </li>
                                             <?php endif; ?>
@@ -309,15 +288,8 @@ $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     </div>
                                     <?php endif; ?>
                                     
-                                    <button class="btn btn-sm text-muted" 
-                                            onclick="replyToComment(<?= $comment['id'] ?>)">
-                                        <i class="bi bi-reply"></i>
-                                        <span class="ms-1">Yanıtla</span>
-                                    </button>
-                                    
                                     <?php if ($auth->isLoggedIn()): ?>
-                                    <button class="btn btn-sm text-muted" 
-                                            onclick="reportComment(<?= $comment['id'] ?>)">
+                                    <button class="btn btn-sm text-muted" onclick="reportContent('comment', <?= $comment['id'] ?>)">
                                         <i class="bi bi-flag"></i>
                                         <span class="ms-1">Şikayet Et</span>
                                     </button>
@@ -781,9 +753,9 @@ async function submitReport(event) {
 }
 
 // Şikayet modalını aç
-function reportComment(commentId) {
+function showCommentModal(topicId, commentId = null) {
     document.getElementById('reportContentType').value = 'comment';
-    document.getElementById('reportContentId').value = commentId;
+    document.getElementById('reportContentId').value = commentId || topicId;
     new bootstrap.Modal(document.getElementById('reportModal')).show();
 }
 </script>
