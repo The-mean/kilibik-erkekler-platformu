@@ -146,3 +146,67 @@ a:hover {
 .theme-toggle:hover {
     background-color: var(--card-border);
 }
+
+/* Ana İçerik Alanı */
+.main-content {
+    margin-top: 48px;
+    /* Navbar yüksekliği */
+    padding-top: 1rem;
+}
+
+/* Başlık Listesi */
+.topic-list {
+    margin: 0 -0.5rem;
+}
+
+.topic-card {
+    margin: 0.5rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.topic-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Yeni Başlık Butonu (Sabit) */
+.floating-new-topic {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 1030;
+    display: none;
+}
+
+@media (max-width: 991.98px) {
+    .floating-new-topic {
+        display: block;
+    }
+
+    .topic-list {
+        margin: 0 -0.25rem;
+    }
+
+    .topic-card {
+        margin: 0.25rem;
+    }
+}
+
+/* Sayfa Başlığı */
+.page-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+/* İçerik Kartları */
+.content-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+/* Önceki tema değişkenleri ve stiller aynı kalacak */
