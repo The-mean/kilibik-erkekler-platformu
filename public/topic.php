@@ -236,24 +236,23 @@ $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             
                             <!-- Yorum İçeriği -->
                             <div class="flex-grow-1 ms-3">
-                                <div class="d-flex justify-content-between align-items-start">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
                                     <div>
                                         <a href="/profile.php?username=<?= htmlspecialchars($comment['username']) ?>" 
                                            class="fw-bold text-decoration-none">
                                             <?= htmlspecialchars($comment['username']) ?>
                                         </a>
                                         <small class="text-muted ms-2">
-                                            <time datetime="<?= $comment['created_at'] ?>" class="timeago">
-                                                <?= htmlspecialchars($comment['created_at']) ?>
-                                            </time>
+                                            <?= timeAgo($comment['created_at']) ?>
                                         </small>
                                     </div>
+                                    
                                     <div class="dropdown">
                                         <button class="btn btn-link text-muted p-0" data-bs-toggle="dropdown">
                                             <i class="bi bi-three-dots-vertical"></i>
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end">
-                                            <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $comment['user_id']): ?>
+                                            <?php if ($auth->isLoggedIn() && $auth->getEffectiveUserId() == $comment['user_id']): ?>
                                             <li>
                                                 <button class="dropdown-item" onclick="editComment(<?= $comment['id'] ?>)">
                                                     <i class="bi bi-pencil me-2"></i>Düzenle
@@ -266,42 +265,63 @@ $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                                 </button>
                                             </li>
                                             <?php endif; ?>
+                                            <?php if ($auth->isLoggedIn()): ?>
                                             <li>
                                                 <button class="dropdown-item" onclick="reportComment(<?= $comment['id'] ?>)">
                                                     <i class="bi bi-flag me-2"></i>Şikayet Et
                                                 </button>
                                             </li>
+                                            <?php endif; ?>
                                         </ul>
                                     </div>
                                 </div>
                                 
-                                <div class="comment-content my-2">
+                                <div class="comment-content mb-2">
                                     <?= nl2br(htmlspecialchars($comment['content'])) ?>
                                 </div>
                                 
                                 <div class="d-flex align-items-center gap-3">
-                                    <div class="btn-group" role="group">
-                                        <button class="btn btn-sm <?= $comment['user_reaction'] === 'like' ? 'btn-primary' : 'btn-outline-primary' ?>" 
+                                    <?php if ($auth->isLoggedIn()): ?>
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm <?= $comment['user_reaction'] === 'like' ? 'btn-primary' : 'btn-outline-primary' ?>"
                                                 onclick="reactToComment(<?= $comment['id'] ?>, 'like')"
-                                                data-comment-id="<?= $comment['id'] ?>"
                                                 data-type="like">
                                             <i class="bi bi-hand-thumbs-up<?= $comment['user_reaction'] === 'like' ? '-fill' : '' ?>"></i>
                                             <span class="like-count"><?= $comment['like_count'] ?></span>
                                         </button>
-                                        <button class="btn btn-sm <?= $comment['user_reaction'] === 'dislike' ? 'btn-danger' : 'btn-outline-danger' ?>" 
+                                        <button class="btn btn-sm <?= $comment['user_reaction'] === 'dislike' ? 'btn-danger' : 'btn-outline-danger' ?>"
                                                 onclick="reactToComment(<?= $comment['id'] ?>, 'dislike')"
-                                                data-comment-id="<?= $comment['id'] ?>"
                                                 data-type="dislike">
                                             <i class="bi bi-hand-thumbs-down<?= $comment['user_reaction'] === 'dislike' ? '-fill' : '' ?>"></i>
                                             <span class="dislike-count"><?= $comment['dislike_count'] ?></span>
                                         </button>
                                     </div>
+                                    <?php else: ?>
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm btn-outline-primary" disabled>
+                                            <i class="bi bi-hand-thumbs-up"></i>
+                                            <span><?= $comment['like_count'] ?></span>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" disabled>
+                                            <i class="bi bi-hand-thumbs-down"></i>
+                                            <span><?= $comment['dislike_count'] ?></span>
+                                        </button>
+                                    </div>
+                                    <?php endif; ?>
                                     
                                     <button class="btn btn-sm text-muted" 
                                             onclick="replyToComment(<?= $comment['id'] ?>)">
                                         <i class="bi bi-reply"></i>
                                         <span class="ms-1">Yanıtla</span>
                                     </button>
+                                    
+                                    <?php if ($auth->isLoggedIn()): ?>
+                                    <button class="btn btn-sm text-muted" 
+                                            onclick="reportComment(<?= $comment['id'] ?>)">
+                                        <i class="bi bi-flag"></i>
+                                        <span class="ms-1">Şikayet Et</span>
+                                    </button>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
@@ -410,11 +430,11 @@ $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <input type="hidden" id="reportContentId" name="content_id">
                     
                     <div class="mb-3">
-                        <label class="form-label">Şikayet Nedeni</label>
+                        <label class="form-label">Şikayet Sebebi</label>
                         <select class="form-select" name="reason" required>
                             <option value="">Seçiniz...</option>
-                            <option value="spam">Spam/Reklam</option>
                             <option value="hakaret">Hakaret/Küfür</option>
+                            <option value="spam">Spam/Reklam</option>
                             <option value="yaniltici">Yanıltıcı Bilgi</option>
                             <option value="nefret">Nefret Söylemi</option>
                             <option value="taciz">Taciz/Zorbalık</option>
@@ -424,16 +444,15 @@ $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                     
                     <div class="mb-3">
-                        <label class="form-label">Açıklama</label>
+                        <label class="form-label">Açıklama (İsteğe bağlı)</label>
                         <textarea class="form-control" name="description" rows="3" 
-                                  placeholder="Lütfen şikayetinizi detaylandırın..."></textarea>
-                    </div>
-                    
-                    <div class="d-flex justify-content-end gap-2">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
-                        <button type="submit" class="btn btn-danger">Şikayet Et</button>
+                                  placeholder="Şikayetinizle ilgili detay ekleyin..."></textarea>
                     </div>
                 </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <button type="submit" form="reportForm" class="btn btn-primary">Gönder</button>
             </div>
         </div>
     </div>
@@ -714,38 +733,58 @@ function reportTopic(topicId) {
     new bootstrap.Modal(document.getElementById('reportModal')).show();
 }
 
-function reportComment(commentId) {
-    document.getElementById('reportContentType').value = 'comment';
-    document.getElementById('reportContentId').value = commentId;
-    new bootstrap.Modal(document.getElementById('reportModal')).show();
-}
-
 // Şikayet formunu gönder
 async function submitReport(event) {
     event.preventDefault();
     
     const form = event.target;
-    const formData = new FormData(form);
+    const submitButton = form.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
     
     try {
+        const formData = new FormData(form);
+        const data = {
+            content_type: formData.get('content_type'),
+            content_id: formData.get('content_id'),
+            reason: formData.get('reason'),
+            description: formData.get('description')
+        };
+        
         const response = await fetch('/api/report.php', {
             method: 'POST',
-            body: formData
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
         });
         
-        const data = await response.json();
+        const result = await response.json();
         
-        if (data.success) {
+        if (result.success) {
+            // Modalı kapat
             bootstrap.Modal.getInstance(document.getElementById('reportModal')).hide();
-            alert('Şikayetiniz alınmıştır. En kısa sürede incelenecektir.');
+            
+            // Formu temizle
             form.reset();
+            
+            // Başarı mesajı göster
+            showAlert('success', result.message);
         } else {
-            alert(data.message || 'Bir hata oluştu');
+            showAlert('danger', result.message);
         }
     } catch (error) {
         console.error('Hata:', error);
-        alert('Bir hata oluştu');
+        showAlert('danger', 'Bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
+    } finally {
+        submitButton.disabled = false;
     }
+}
+
+// Şikayet modalını aç
+function reportComment(commentId) {
+    document.getElementById('reportContentType').value = 'comment';
+    document.getElementById('reportContentId').value = commentId;
+    new bootstrap.Modal(document.getElementById('reportModal')).show();
 }
 </script>
 
