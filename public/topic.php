@@ -48,12 +48,12 @@ $comments_query = "SELECT
     c.*,
     u.username,
     u.avatar,
-    COUNT(DISTINCT l.id) as like_count,
-    CASE WHEN ul.id IS NOT NULL THEN 1 ELSE 0 END as is_liked
+    COUNT(DISTINCT CASE WHEN cr.type = 'like' THEN cr.id END) as like_count,
+    COUNT(DISTINCT CASE WHEN cr.type = 'dislike' THEN cr.id END) as dislike_count,
+    MAX(CASE WHEN cr.user_id = :user_id THEN cr.type END) as user_reaction
 FROM comments c
 LEFT JOIN users u ON c.user_id = u.id
-LEFT JOIN likes l ON c.id = l.comment_id
-LEFT JOIN likes ul ON c.id = ul.comment_id AND ul.user_id = :user_id
+LEFT JOIN comment_reactions cr ON c.id = cr.comment_id
 WHERE c.topic_id = :topic_id AND c.is_deleted = 0
 GROUP BY c.id
 ORDER BY c.created_at ASC";
@@ -280,11 +280,22 @@ $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 </div>
                                 
                                 <div class="d-flex align-items-center gap-3">
-                                    <button class="btn btn-sm <?= $comment['is_liked'] ? 'text-danger' : 'text-muted' ?>" 
-                                            onclick="likeComment(<?= $comment['id'] ?>)">
-                                        <i class="bi bi-heart<?= $comment['is_liked'] ? '-fill' : '' ?>"></i>
-                                        <span class="ms-1"><?= $comment['like_count'] ?></span>
-                                    </button>
+                                    <div class="btn-group" role="group">
+                                        <button class="btn btn-sm <?= $comment['user_reaction'] === 'like' ? 'btn-primary' : 'btn-outline-primary' ?>" 
+                                                onclick="reactToComment(<?= $comment['id'] ?>, 'like')"
+                                                data-comment-id="<?= $comment['id'] ?>"
+                                                data-type="like">
+                                            <i class="bi bi-hand-thumbs-up<?= $comment['user_reaction'] === 'like' ? '-fill' : '' ?>"></i>
+                                            <span class="like-count"><?= $comment['like_count'] ?></span>
+                                        </button>
+                                        <button class="btn btn-sm <?= $comment['user_reaction'] === 'dislike' ? 'btn-danger' : 'btn-outline-danger' ?>" 
+                                                onclick="reactToComment(<?= $comment['id'] ?>, 'dislike')"
+                                                data-comment-id="<?= $comment['id'] ?>"
+                                                data-type="dislike">
+                                            <i class="bi bi-hand-thumbs-down<?= $comment['user_reaction'] === 'dislike' ? '-fill' : '' ?>"></i>
+                                            <span class="dislike-count"><?= $comment['dislike_count'] ?></span>
+                                        </button>
+                                    </div>
                                     
                                     <button class="btn btn-sm text-muted" 
                                             onclick="replyToComment(<?= $comment['id'] ?>)">
@@ -629,26 +640,42 @@ function showAlert(type, message) {
 }
 
 // Yorum beğenme işlemi
-async function likeComment(commentId) {
+async function reactToComment(commentId, type) {
     try {
-        const response = await fetch('/api/comments/like.php', {
+        const response = await fetch('/api/like_comment.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ comment_id: commentId })
+            body: JSON.stringify({ comment_id: commentId, type: type })
         });
         
         const data = await response.json();
         
         if (data.success) {
-            location.reload();
+            const comment = document.querySelector(`#comment-${commentId}`);
+            const likeBtn = comment.querySelector(`[data-type="like"]`);
+            const dislikeBtn = comment.querySelector(`[data-type="dislike"]`);
+            const likeCount = comment.querySelector('.like-count');
+            const dislikeCount = comment.querySelector('.dislike-count');
+            
+            // Sayıları güncelle
+            likeCount.textContent = data.stats.likes;
+            dislikeCount.textContent = data.stats.dislikes;
+            
+            // Buton stillerini güncelle
+            likeBtn.className = `btn btn-sm ${data.userReaction === 'like' ? 'btn-primary' : 'btn-outline-primary'}`;
+            dislikeBtn.className = `btn btn-sm ${data.userReaction === 'dislike' ? 'btn-danger' : 'btn-outline-danger'}`;
+            
+            // İkon stillerini güncelle
+            likeBtn.querySelector('i').className = `bi bi-hand-thumbs-up${data.userReaction === 'like' ? '-fill' : ''}`;
+            dislikeBtn.querySelector('i').className = `bi bi-hand-thumbs-down${data.userReaction === 'dislike' ? '-fill' : ''}`;
         } else {
-            alert(data.message || 'Bir hata oluştu');
+            showAlert('danger', data.message);
         }
     } catch (error) {
         console.error('Hata:', error);
-        alert('Bir hata oluştu');
+        showAlert('danger', 'Bir hata oluştu');
     }
 }
 
