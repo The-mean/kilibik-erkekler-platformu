@@ -1,84 +1,213 @@
-<footer class="footer mt-auto">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-4 mb-4 mb-md-0">
-                <h5 class="mb-3">Kılıbık Erkekler Platformu</h5>
-                <p class="text-muted">
-                    Türkiye'nin en büyük kılıbık erkekler topluluğu. 
-                    Deneyimlerinizi paylaşın, başkalarının hikayelerini okuyun.
-                </p>
-                <div class="social-links">
-                    <a href="https://facebook.com/kilibikerkekler" target="_blank" rel="noopener">
-                        <i class="bi bi-facebook"></i>
-                    </a>
-                    <a href="https://twitter.com/kilibikerkekler" target="_blank" rel="noopener">
-                        <i class="bi bi-twitter"></i>
-                    </a>
-                    <a href="https://instagram.com/kilibikerkekler" target="_blank" rel="noopener">
-                        <i class="bi bi-instagram"></i>
-                    </a>
-                    <a href="https://youtube.com/kilibikerkekler" target="_blank" rel="noopener">
-                        <i class="bi bi-youtube"></i>
-                    </a>
+<!-- Footer -->
+<footer class="footer mt-5">
+    <div class="footer-top py-5">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <div class="footer-brand mb-4">
+                        <img src="/assets/images/logo.svg" alt="Logo" width="32" height="32" class="me-2">
+                        <span class="brand-text h5 mb-0">Kılıbık Erkekler</span>
+                    </div>
+                    <p class="text-muted mb-4">
+                        Türkiye'nin en büyük kılıbık erkekler topluluğu. 
+                        Deneyimlerinizi paylaşın, başkalarının hikayelerini okuyun.
+                    </p>
+                    <div class="social-links">
+                        <a href="https://facebook.com/kilibikerkekler" class="social-link" title="Facebook">
+                            <i class="bi bi-facebook"></i>
+                        </a>
+                        <a href="https://twitter.com/kilibikerkekler" class="social-link" title="Twitter">
+                            <i class="bi bi-twitter-x"></i>
+                        </a>
+                        <a href="https://instagram.com/kilibikerkekler" class="social-link" title="Instagram">
+                            <i class="bi bi-instagram"></i>
+                        </a>
+                        <a href="https://youtube.com/kilibikerkekler" class="social-link" title="YouTube">
+                            <i class="bi bi-youtube"></i>
+                        </a>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="col-md-2 mb-4 mb-md-0">
-                <h6 class="mb-3">Platform</h6>
-                <ul class="footer-links">
-                    <li><a href="/about.php">Hakkımızda</a></li>
-                    <li><a href="/contact.php">İletişim</a></li>
-                    <li><a href="/rules.php">Kurallar</a></li>
-                    <li><a href="/faq.php">S.S.S</a></li>
-                </ul>
-            </div>
-            
-            <div class="col-md-2 mb-4 mb-md-0">
-                <h6 class="mb-3">Yasal</h6>
-                <ul class="footer-links">
-                    <li><a href="/privacy.php">Gizlilik Politikası</a></li>
-                    <li><a href="/terms.php">Kullanım Koşulları</a></li>
-                    <li><a href="/cookies.php">Çerez Politikası</a></li>
-                    <li><a href="/gdpr.php">KVKK</a></li>
-                </ul>
-            </div>
-            
-            <div class="col-md-4">
-                <h6 class="mb-3">Mobil Uygulama</h6>
-                <div class="d-flex gap-2 mb-3">
-                    <a href="#" class="app-store-badge">
-                        <img src="/assets/images/app-store.svg" alt="App Store" height="40">
-                    </a>
-                    <a href="#" class="play-store-badge">
-                        <img src="/assets/images/play-store.svg" alt="Play Store" height="40">
-                    </a>
+                
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="footer-title">Platform</h6>
+                    <ul class="footer-links">
+                        <li><a href="/about">Hakkımızda</a></li>
+                        <li><a href="/contact">İletişim</a></li>
+                        <li><a href="/rules">Kurallar</a></li>
+                        <li><a href="/faq">S.S.S</a></li>
+                    </ul>
                 </div>
-                <p class="text-muted small">
-                    Mobil uygulamamızı indirerek bildirimlerden anında haberdar olun, 
-                    offline okuma yapın ve daha fazla özelliğe erişin.
-                </p>
+                
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="footer-title">Yasal</h6>
+                    <ul class="footer-links">
+                        <li><a href="/privacy">Gizlilik Politikası</a></li>
+                        <li><a href="/terms">Kullanım Koşulları</a></li>
+                        <li><a href="/cookies">Çerez Politikası</a></li>
+                        <li><a href="/gdpr">KVKK</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-4 col-md-6">
+                    <h6 class="footer-title">Mobil Uygulama</h6>
+                    <p class="text-muted mb-3">Mobil uygulamamızı indirerek bildirimlerden anında haberdar olun.</p>
+                    <div class="app-badges">
+                        <a href="#" class="app-badge">
+                            <img src="/assets/images/app-store.svg" alt="App Store" height="40">
+                        </a>
+                        <a href="#" class="app-badge ms-2">
+                            <img src="/assets/images/play-store.svg" alt="Play Store" height="40">
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
-        
-        <hr class="my-4">
-        
-        <div class="row align-items-center">
-            <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-                <p class="mb-0 text-muted">
-                    &copy; <?= date('Y') ?> Kılıbık Erkekler Platformu. Tüm hakları saklıdır.
-                </p>
-            </div>
-            <div class="col-md-6 text-center text-md-end">
-                <div class="theme-switch">
-                    <button class="btn btn-sm btn-outline-secondary" id="themeToggle">
-                        <i class="bi bi-moon-stars"></i>
-                        <span class="ms-2 d-none d-sm-inline">Karanlık Mod</span>
+    </div>
+    
+    <div class="footer-bottom py-3">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0 small">
+                        &copy; <?= date('Y') ?> Kılıbık Erkekler Platformu. Tüm hakları saklıdır.
+                    </p>
+                </div>
+                <div class="col-md-6 text-center text-md-end mt-3 mt-md-0">
+                    <button class="btn btn-sm btn-link text-muted" id="themeToggle">
+                        <i class="bi bi-moon-stars me-2"></i>
+                        <span>Tema Değiştir</span>
                     </button>
                 </div>
             </div>
         </div>
     </div>
 </footer>
+
+<style>
+/* Footer Stilleri */
+.footer {
+    background-color: var(--footer-bg);
+    border-top: 1px solid var(--border-color);
+}
+
+.footer-top {
+    background-color: var(--footer-top-bg);
+}
+
+.footer-bottom {
+    background-color: var(--footer-bottom-bg);
+    border-top: 1px solid var(--border-color);
+}
+
+.footer-brand {
+    display: flex;
+    align-items: center;
+}
+
+.footer-title {
+    color: var(--text-color);
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links li {
+    margin-bottom: 0.75rem;
+}
+
+.footer-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s ease;
+    font-size: 0.9rem;
+}
+
+.footer-links a:hover {
+    color: var(--primary-color);
+}
+
+.social-links {
+    display: flex;
+    gap: 1rem;
+}
+
+.social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: var(--hover-bg);
+    color: var(--text-color);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.social-link:hover {
+    transform: translateY(-2px);
+    color: var(--primary-color);
+    background-color: var(--primary-color-light);
+}
+
+.app-badges {
+    display: flex;
+    gap: 1rem;
+}
+
+.app-badge {
+    transition: transform 0.2s ease;
+}
+
+.app-badge:hover {
+    transform: translateY(-2px);
+}
+
+/* Tema Değişkenleri */
+:root[data-theme="light"] {
+    --footer-bg: #ffffff;
+    --footer-top-bg: #f8f9fa;
+    --footer-bottom-bg: #ffffff;
+    --text-muted: #6c757d;
+    --hover-bg: #f0f2f5;
+    --primary-color-light: rgba(52, 152, 219, 0.1);
+}
+
+:root[data-theme="dark"] {
+    --footer-bg: #1a1a1a;
+    --footer-top-bg: #2c2c2c;
+    --footer-bottom-bg: #1a1a1a;
+    --text-muted: #a0a0a0;
+    --hover-bg: #363636;
+    --primary-color-light: rgba(97, 218, 251, 0.1);
+}
+
+/* Mobil Uyumluluk */
+@media (max-width: 767.98px) {
+    .footer-title {
+        margin-bottom: 1rem;
+    }
+    
+    .footer-links li {
+        margin-bottom: 0.5rem;
+    }
+    
+    .social-links {
+        justify-content: center;
+        margin-top: 1rem;
+    }
+    
+    .app-badges {
+        justify-content: center;
+    }
+}
+</style>
 
 <!-- Çerez Bildirimi -->
 <div class="toast-container position-fixed bottom-0 end-0 p-3">
