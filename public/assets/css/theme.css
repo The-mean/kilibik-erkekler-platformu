@@ -1,0 +1,148 @@
+/* Tema Değişkenleri */
+:root[data-theme="light"] {
+    --bg-color: #f8f9fa;
+    --text-color: #2c3e50;
+    --navbar-bg: #ffffff;
+    --navbar-text: #2c3e50;
+    --card-bg: #ffffff;
+    --card-border: #dee2e6;
+    --link-color: #3498db;
+    --link-hover: #2980b9;
+    --input-bg: #ffffff;
+    --input-border: #ced4da;
+    --btn-primary-bg: #3498db;
+    --btn-primary-text: #ffffff;
+    --footer-bg: #ffffff;
+    --footer-text: #6c757d;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+:root[data-theme="dark"] {
+    --bg-color: #1a1a1a;
+    --text-color: #e0e0e0;
+    --navbar-bg: #2c2c2c;
+    --navbar-text: #ffffff;
+    --card-bg: #2c2c2c;
+    --card-border: #404040;
+    --link-color: #61dafb;
+    --link-hover: #4fa8d3;
+    --input-bg: #333333;
+    --input-border: #404040;
+    --btn-primary-bg: #61dafb;
+    --btn-primary-text: #000000;
+    --footer-bg: #2c2c2c;
+    --footer-text: #a0a0a0;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+}
+
+/* Sistem temasını algıla */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) {
+        --bg-color: #1a1a1a;
+        --text-color: #e0e0e0;
+        --navbar-bg: #2c2c2c;
+        --navbar-text: #ffffff;
+        --card-bg: #2c2c2c;
+        --card-border: #404040;
+        --link-color: #61dafb;
+        --link-hover: #4fa8d3;
+        --input-bg: #333333;
+        --input-border: #404040;
+        --btn-primary-bg: #61dafb;
+        --btn-primary-text: #000000;
+        --footer-bg: #2c2c2c;
+        --footer-text: #a0a0a0;
+        --shadow-color: rgba(0, 0, 0, 0.3);
+    }
+}
+
+/* Genel Stiller */
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Navbar Stilleri */
+.navbar {
+    background-color: var(--navbar-bg) !important;
+    color: var(--navbar-text);
+    box-shadow: 0 2px 4px var(--shadow-color);
+}
+
+.navbar-brand,
+.nav-link {
+    color: var(--navbar-text) !important;
+}
+
+/* Kart Stilleri */
+.card {
+    background-color: var(--card-bg);
+    border-color: var(--card-border);
+}
+
+.card-title {
+    color: var(--text-color);
+}
+
+/* Form Stilleri */
+.form-control {
+    background-color: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--text-color);
+}
+
+.form-control:focus {
+    background-color: var(--input-bg);
+    border-color: var(--link-color);
+    color: var(--text-color);
+}
+
+/* Buton Stilleri */
+.btn-primary {
+    background-color: var(--btn-primary-bg);
+    border-color: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+}
+
+.btn-primary:hover {
+    background-color: var(--link-hover);
+    border-color: var(--link-hover);
+}
+
+/* Link Stilleri */
+a {
+    color: var(--link-color);
+}
+
+a:hover {
+    color: var(--link-hover);
+}
+
+/* Footer Stilleri */
+.footer {
+    background-color: var(--footer-bg);
+    color: var(--footer-text);
+}
+
+/* Tema Geçiş Animasyonu */
+* {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Tema Değiştirici Butonu */
+.theme-toggle {
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s;
+}
+
+.theme-toggle:hover {
+    background-color: var(--card-border);
+}
