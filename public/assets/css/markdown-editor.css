@@ -1,0 +1,205 @@
+.markdown-editor {
+    position: relative;
+}
+
+.markdown-editor-toolbar {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-bottom: none;
+    border-radius: 0.375rem 0.375rem 0 0;
+}
+
+.markdown-editor-toolbar button {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-color);
+    background: none;
+    border: 1px solid var(--border-color);
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.markdown-editor-toolbar button:hover {
+    background: var(--hover-bg);
+}
+
+.markdown-editor-toolbar button i {
+    font-size: 0.875rem;
+}
+
+.markdown-editor textarea {
+    width: 100%;
+    min-height: 200px;
+    padding: 0.75rem;
+    font-family: monospace;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--text-color);
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0 0 0.375rem 0.375rem;
+    resize: vertical;
+}
+
+.markdown-editor textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(var(--primary-rgb), 0.25);
+}
+
+.markdown-preview {
+    display: none;
+    padding: 1rem;
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+}
+
+.markdown-preview.active {
+    display: block;
+}
+
+.markdown-preview h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.markdown-preview h2 {
+    font-size: 1.75rem;
+    margin-bottom: 0.875rem;
+}
+
+.markdown-preview h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.markdown-preview h4 {
+    font-size: 1.25rem;
+    margin-bottom: 0.625rem;
+}
+
+.markdown-preview h5 {
+    font-size: 1.125rem;
+    margin-bottom: 0.5rem;
+}
+
+.markdown-preview h6 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.markdown-preview p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+.markdown-preview code {
+    padding: 0.2rem 0.4rem;
+    font-family: monospace;
+    font-size: 0.875em;
+    color: var(--code-color);
+    background: var(--code-bg);
+    border-radius: 0.25rem;
+}
+
+.markdown-preview pre {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background: var(--code-bg);
+    border-radius: 0.375rem;
+    overflow-x: auto;
+}
+
+.markdown-preview pre code {
+    padding: 0;
+    background: none;
+}
+
+.markdown-preview blockquote {
+    padding: 0.5rem 1rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid var(--border-color);
+    color: var(--muted-color);
+}
+
+.markdown-preview ul,
+.markdown-preview ol {
+    margin-bottom: 1rem;
+    padding-left: 2rem;
+}
+
+.markdown-preview li {
+    margin-bottom: 0.5rem;
+}
+
+.markdown-preview img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.375rem;
+}
+
+.markdown-preview table {
+    width: 100%;
+    margin-bottom: 1rem;
+    border-collapse: collapse;
+}
+
+.markdown-preview th,
+.markdown-preview td {
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+}
+
+.markdown-preview th {
+    background: var(--table-header-bg);
+}
+
+.markdown-preview hr {
+    margin: 2rem 0;
+    border: 0;
+    border-top: 1px solid var(--border-color);
+}
+
+.markdown-editor-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--muted-color);
+    border: 1px solid var(--border-color);
+    border-top: none;
+    border-radius: 0 0 0.375rem 0.375rem;
+}
+
+.markdown-editor-footer .draft-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.markdown-editor-footer .draft-status i {
+    font-size: 0.875rem;
+}
+
+.markdown-editor-footer .char-count {
+    color: var(--muted-color);
+}
+
+/* Tema değişkenleri */
+:root {
+    --code-color: #e83e8c;
+    --code-bg: #f8f9fa;
+    --table-header-bg: #f8f9fa;
+}
+
+[data-theme="dark"] {
+    --code-color: #ff69b4;
+    --code-bg: #2d3238;
+    --table-header-bg: #2d3238;
+}

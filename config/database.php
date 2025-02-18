@@ -1,7 +1,12 @@
 <?php
 require_once __DIR__ . '/../includes/security.php';
 
-define('DB_FILE', __DIR__ . '/../database/sozluk.db');
+// MySQL bağlantı bilgileri
+define('DB_HOST', 'localhost');
+define('DB_NAME', 'kilibik_erkekler');
+define('DB_USER', 'root');
+define('DB_PASS', '');
+define('DB_CHARSET', 'utf8mb4');
 
 class Database {
     private static $instance = null;
@@ -9,27 +14,18 @@ class Database {
 
     private function __construct() {
         try {
-            // Veritabanı dizininin varlığını kontrol et
-            $dbDir = dirname(DB_FILE);
-            if (!is_dir($dbDir)) {
-                mkdir($dbDir, 0777, true);
-            }
-
-            // Veritabanı bağlantısını oluştur
-            $this->db = new PDO('sqlite:' . DB_FILE);
+            // MySQL bağlantısını oluştur
+            $dsn = sprintf("mysql:host=%s;dbname=%s;charset=%s", 
+                DB_HOST, DB_NAME, DB_CHARSET);
             
-            // Hata modunu ayarla
-            $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            
-            // SQLite güvenlik ayarları
-            $this->db->exec('PRAGMA foreign_keys = ON');
-            $this->db->exec('PRAGMA journal_mode = WAL');
-            $this->db->exec('PRAGMA synchronous = NORMAL');
+            $options = [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES => false,
+                PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci"
+            ];
 
-            // Veritabanı dosyasının yazılabilir olduğunu kontrol et
-            if (!is_writable(DB_FILE) && file_exists(DB_FILE)) {
-                throw new Exception('Veritabanı dosyası yazılabilir değil: ' . DB_FILE);
-            }
+            $this->db = new PDO($dsn, DB_USER, DB_PASS, $options);
 
         } catch (PDOException $e) {
             error_log('PDO Hatası: ' . $e->getMessage());

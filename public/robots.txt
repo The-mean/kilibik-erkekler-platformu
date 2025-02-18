@@ -1,0 +1,18 @@
+User-agent: *
+Allow: /
+Allow: /topic/
+Allow: /profile/
+Allow: /tag/
+Allow: /search/
+
+Disallow: /api/
+Disallow: /admin/
+Disallow: /includes/
+Disallow: /config/
+Disallow: /setup/
+Disallow: /assets/js/
+Disallow: /assets/css/
+
+Sitemap: https://kilibikerkekler.com/sitemap.xml
+
+# Crawl-delay: 10 

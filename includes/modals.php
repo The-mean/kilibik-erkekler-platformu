@@ -91,7 +91,9 @@
                         <label for="comment_content" class="form-label">Yorumunuz</label>
                         <textarea class="form-control" id="comment_content" name="content" 
                                 rows="5" required minlength="5"></textarea>
-                        <small class="form-text text-muted">En az 5 karakter girmelisiniz.</small>
+                        <small class="form-text text-muted">
+                            En az 5 karakter. Markdown formatı desteklenmektedir.
+                        </small>
                     </div>
                     <div class="alert alert-danger d-none" id="commentError"></div>
                     <div class="d-flex justify-content-end">
@@ -142,4 +144,28 @@
             </div>
         </div>
     </div>
-</div> 
+</div>
+
+<script>
+let commentEditor;
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Markdown editörünü başlat
+    commentEditor = new MarkdownEditor(document.getElementById('comment_content'), {
+        minLength: 5,
+        placeholder: 'Yorumunuzu yazın... Markdown formatı desteklenmektedir.',
+        autosave: true
+    });
+    
+    // Modal kapandığında taslağı temizle
+    const commentModal = document.getElementById('commentModal');
+    commentModal.addEventListener('hidden.bs.modal', function() {
+        commentEditor.clearDraft();
+    });
+    
+    // Form gönderildiğinde taslağı temizle
+    document.getElementById('commentForm').addEventListener('submit', function() {
+        commentEditor.clearDraft();
+    });
+});
+</script> 

@@ -33,9 +33,9 @@ class Security {
     }
 
     /**
-     * CSRF token oluşturur
+     * CSRF token oluşturur veya mevcut tokeni döndürür
      */
-    public static function generateCsrfToken() {
+    public static function getCSRFToken() {
         if (empty($_SESSION['csrf_token'])) {
             $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         }
@@ -45,11 +45,124 @@ class Security {
     /**
      * CSRF token doğrular
      */
-    public static function validateCsrfToken($token) {
+    public static function validateCSRFToken($token) {
         if (empty($_SESSION['csrf_token']) || empty($token)) {
             return false;
         }
         return hash_equals($_SESSION['csrf_token'], $token);
+    }
+
+    /**
+     * CSRF token HTML input elementi oluşturur
+     */
+    public static function getCSRFTokenInput() {
+        $token = self::getCSRFToken();
+        return '<input type="hidden" name="csrf_token" value="' . $token . '">';
+    }
+
+    /**
+     * XSS koruması için HTML özel karakterleri temizler
+     */
+    public static function sanitizeHTML($input) {
+        if (is_array($input)) {
+            return array_map([self::class, 'sanitizeHTML'], $input);
+        }
+        
+        // HTML özel karakterleri dönüştür
+        $output = htmlspecialchars($input, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        
+        // Tehlikeli JavaScript olabilecek içerikleri temizle
+        $output = preg_replace('/(on\w+)=/', 'data-blocked-$1=', $output);
+        $output = preg_replace('/javascript:/i', 'blocked-javascript:', $output);
+        
+        return $output;
+    }
+
+    /**
+     * Güvenli URL oluşturur
+     */
+    public static function sanitizeURL($url) {
+        // URL'yi temizle
+        $url = filter_var($url, FILTER_SANITIZE_URL);
+        
+        // Sadece güvenli protokollere izin ver
+        if (!preg_match('#^https?://#i', $url)) {
+            $url = 'http://' . $url;
+        }
+        
+        return $url;
+    }
+
+    /**
+     * Güvenli dosya adı oluşturur
+     */
+    public static function sanitizeFileName($fileName) {
+        // Uzantıyı al
+        $extension = pathinfo($fileName, PATHINFO_EXTENSION);
+        
+        // Dosya adını temizle
+        $fileName = pathinfo($fileName, PATHINFO_FILENAME);
+        
+        // Sadece alfanumerik karakterler, tire ve alt çizgiye izin ver
+        $fileName = preg_replace('/[^a-z0-9-_]/i', '-', $fileName);
+        
+        // Çoklu tireleri tekil tireye dönüştür
+        $fileName = preg_replace('/-+/', '-', $fileName);
+        
+        // Başındaki ve sonundaki tireleri kaldır
+        $fileName = trim($fileName, '-');
+        
+        // Benzersiz bir isim oluştur
+        return sprintf('%s-%s.%s', $fileName, uniqid(), $extension);
+    }
+
+    /**
+     * Güvenli şifre politikası kontrolü
+     */
+    public static function validatePassword($password) {
+        $errors = [];
+        
+        if (strlen($password) < 8) {
+            $errors[] = 'Şifre en az 8 karakter olmalıdır.';
+        }
+        
+        if (!preg_match('/[A-Z]/', $password)) {
+            $errors[] = 'Şifre en az bir büyük harf içermelidir.';
+        }
+        
+        if (!preg_match('/[a-z]/', $password)) {
+            $errors[] = 'Şifre en az bir küçük harf içermelidir.';
+        }
+        
+        if (!preg_match('/[0-9]/', $password)) {
+            $errors[] = 'Şifre en az bir rakam içermelidir.';
+        }
+        
+        if (!preg_match('/[!@#$%^&*()\-_=+{};:,<.>]/', $password)) {
+            $errors[] = 'Şifre en az bir özel karakter içermelidir.';
+        }
+        
+        return empty($errors) ? true : $errors;
+    }
+
+    /**
+     * Oturum güvenliği için kullanıcı parmak izi oluşturur
+     */
+    public static function generateUserFingerprint() {
+        $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+        $ip = self::getIpAddress();
+        return hash('sha256', $userAgent . $ip . $_SERVER['REMOTE_PORT']);
+    }
+
+    /**
+     * Oturum güvenliğini kontrol eder
+     */
+    public static function validateSession() {
+        if (empty($_SESSION['user_fingerprint'])) {
+            return false;
+        }
+        
+        return hash_equals($_SESSION['user_fingerprint'], self::generateUserFingerprint());
     }
 
     /**
@@ -134,20 +247,5 @@ class Security {
         }
 
         return true;
-    }
-
-    /**
-     * Güvenli dosya adı oluşturur
-     */
-    public static function sanitizeFileName($fileName) {
-        // Uzantıyı al
-        $extension = pathinfo($fileName, PATHINFO_EXTENSION);
-        
-        // Dosya adını temizle
-        $fileName = pathinfo($fileName, PATHINFO_FILENAME);
-        $fileName = preg_replace('/[^a-z0-9]+/', '-', strtolower($fileName));
-        
-        // Benzersiz bir isim oluştur
-        return sprintf('%s-%s.%s', $fileName, uniqid(), $extension);
     }
 } 

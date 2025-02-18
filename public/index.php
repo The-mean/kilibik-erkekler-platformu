@@ -2,242 +2,244 @@
 require_once '../includes/init.php';
 require_once '../includes/header.php';
 require_once '../includes/navbar.php';
+require_once '../includes/category_manager.php';
+
+$categoryManager = new CategoryManager();
+
+// Kategori filtresi
+$categoryId = isset($_GET['category']) ? (int)$_GET['category'] : 0;
+$tagSlug = isset($_GET['tag']) ? trim($_GET['tag']) : '';
 
 // Sayfalama için parametreler
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $per_page = 20;
 $offset = ($page - 1) * $per_page;
 
+// Kategorileri ve popüler etiketleri al
+$categories = $categoryManager->getAllCategories();
+$popularTags = $categoryManager->getPopularTags(10);
+
 // Konuları getir
-$topics_query = "SELECT 
-    t.*, 
-    u.username, 
-    u.avatar,
-    COUNT(DISTINCT c.id) as comment_count,
-    COUNT(DISTINCT l.id) as like_count
-FROM topics t
-LEFT JOIN users u ON t.user_id = u.id
-LEFT JOIN comments c ON t.id = c.topic_id
-LEFT JOIN likes l ON t.id = l.topic_id
-WHERE t.is_deleted = 0
-GROUP BY t.id
-ORDER BY t.created_at DESC
-LIMIT :limit OFFSET :offset";
+if ($categoryId) {
+    $topics = $categoryManager->getTopicsByCategory($categoryId, $page, $per_page);
+    $total_topics = $categoryManager->getCategoryTopicCount($categoryId);
+} elseif ($tagSlug) {
+    $topics = $categoryManager->getTopicsByTag($tagSlug, $page, $per_page);
+    $total_topics = $categoryManager->getTagTopicCount($tagSlug);
+} else {
+    $topics_query = "SELECT 
+        t.*, 
+        u.username, 
+        u.avatar,
+        c.name as category_name,
+        c.slug as category_slug,
+        COUNT(DISTINCT cm.id) as comment_count,
+        COUNT(DISTINCT l.id) as like_count
+    FROM topics t
+    LEFT JOIN users u ON t.user_id = u.id
+    LEFT JOIN categories c ON t.category_id = c.id
+    LEFT JOIN comments cm ON t.id = cm.topic_id
+    LEFT JOIN likes l ON t.id = l.topic_id
+    WHERE t.is_deleted = 0
+    GROUP BY t.id
+    ORDER BY t.created_at DESC
+    LIMIT :limit OFFSET :offset";
 
-$topics = $db->fetchAll($topics_query, [
-    ':limit' => $per_page,
-    ':offset' => $offset
-]);
+    $topics = $db->fetchAll($topics_query, [
+        ':limit' => $per_page,
+        ':offset' => $offset
+    ]);
 
-// Toplam konu sayısını getir
-$total_query = "SELECT COUNT(*) as count FROM topics WHERE is_deleted = 0";
-$result = $db->fetchOne($total_query);
-$total_topics = $result['count'];
+    // Toplam konu sayısını getir
+    $total_query = "SELECT COUNT(*) as count FROM topics WHERE is_deleted = 0";
+    $result = $db->fetchOne($total_query);
+    $total_topics = $result['count'];
+}
+
 $total_pages = ceil($total_topics / $per_page);
 ?>
 
-<main class="container py-4">
-    <!-- Filtreler ve Sıralama -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div class="d-flex gap-2">
-            <div class="dropdown">
-                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                    <i class="bi bi-filter"></i> Filtrele
-                </button>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="?filter=popular">En Popüler</a></li>
-                    <li><a class="dropdown-item" href="?filter=most_commented">En Çok Yorum Alan</a></li>
-                    <li><a class="dropdown-item" href="?filter=most_liked">En Çok Beğenilen</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="?filter=this_week">Bu Hafta</a></li>
-                    <li><a class="dropdown-item" href="?filter=this_month">Bu Ay</a></li>
-                    <li><a class="dropdown-item" href="?filter=all_time">Tüm Zamanlar</a></li>
-                </ul>
-            </div>
-            
-            <?php if (isset($_SESSION['user_id'])): ?>
-            <a href="/new-topic.php" class="btn btn-primary">
-                <i class="bi bi-plus-lg"></i> Yeni Konu Aç
-            </a>
-            <?php endif; ?>
-        </div>
-        
-        <div class="d-none d-md-block">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="/">Ana Sayfa</a></li>
-                    <li class="breadcrumb-item active">Konular</li>
-                </ol>
-            </nav>
-        </div>
-    </div>
-    
-    <!-- Konular Listesi -->
-    <div class="row g-4">
-        <?php foreach ($topics as $topic): ?>
-        <div class="col-12">
-            <div class="card topic-card h-100">
-                <div class="card-body">
-                    <div class="d-flex">
-                        <!-- Kullanıcı Avatarı -->
-                        <div class="flex-shrink-0">
-                            <a href="/profile.php?username=<?= htmlspecialchars($topic['username']) ?>" class="d-block">
-                                <?php if ($topic['avatar']): ?>
-                                    <img src="<?= htmlspecialchars($topic['avatar']) ?>" 
-                                         class="rounded-circle" 
-                                         width="48" 
-                                         height="48"
-                                         alt="<?= htmlspecialchars($topic['username']) ?>">
-                                <?php else: ?>
-                                    <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white" 
-                                         style="width: 48px; height: 48px;">
-                                        <i class="bi bi-person-fill" style="font-size: 1.5rem;"></i>
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= $categoryId ? htmlspecialchars($categories[$categoryId]['name']) . ' - ' : '' ?>Kılıbık Erkekler Platformu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="<?= $assets['css'] ?>">
+</head>
+<body>
+    <?php include __DIR__ . '/../includes/navbar.php'; ?>
+
+    <main class="container py-4">
+        <div class="row">
+            <!-- Ana İçerik -->
+            <div class="col-lg-8">
+                <?php if ($categoryId && isset($categories[$categoryId])): ?>
+                <div class="mb-4">
+                    <h1 class="h3"><?= htmlspecialchars($categories[$categoryId]['name']) ?></h1>
+                    <?php if ($categories[$categoryId]['description']): ?>
+                        <p class="text-muted"><?= htmlspecialchars($categories[$categoryId]['description']) ?></p>
+                    <?php endif; ?>
+                </div>
+                <?php elseif ($tagSlug): ?>
+                <div class="mb-4">
+                    <h1 class="h3">#<?= htmlspecialchars($tagSlug) ?> Etiketi</h1>
+                </div>
+                <?php endif; ?>
+
+                <div class="row g-4">
+                    <?php foreach ($topics as $topic): ?>
+                    <div class="col-12">
+                        <div class="card topic-card h-100">
+                            <div class="card-body">
+                                <div class="d-flex">
+                                    <!-- Kullanıcı Avatarı -->
+                                    <div class="flex-shrink-0">
+                                        <a href="/profile.php?username=<?= htmlspecialchars($topic['username']) ?>" class="d-block">
+                                            <?php if ($topic['avatar']): ?>
+                                                <img src="<?= htmlspecialchars($topic['avatar']) ?>" 
+                                                     class="rounded-circle" 
+                                                     width="48" 
+                                                     height="48"
+                                                     alt="<?= htmlspecialchars($topic['username']) ?>">
+                                            <?php else: ?>
+                                                <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white" 
+                                                     style="width: 48px; height: 48px;">
+                                                    <i class="bi bi-person-fill" style="font-size: 1.5rem;"></i>
+                                                </div>
+                                            <?php endif; ?>
+                                        </a>
                                     </div>
-                                <?php endif; ?>
-                            </a>
-                        </div>
-                        
-                        <!-- Konu İçeriği -->
-                        <div class="flex-grow-1 ms-3">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <h2 class="h5 card-title mb-1">
-                                    <a href="/topic.php?id=<?= $topic['id'] ?>" class="text-decoration-none">
-                                        <?= htmlspecialchars($topic['title']) ?>
-                                    </a>
-                                </h2>
-                                <div class="dropdown">
-                                    <button class="btn btn-link text-muted p-0" data-bs-toggle="dropdown">
-                                        <i class="bi bi-three-dots-vertical"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end">
-                                        <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $topic['user_id']): ?>
-                                        <li>
-                                            <a class="dropdown-item" href="/edit-topic.php?id=<?= $topic['id'] ?>">
-                                                <i class="bi bi-pencil me-2"></i> Düzenle
+                                    
+                                    <!-- Konu İçeriği -->
+                                    <div class="flex-grow-1 ms-3">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h2 class="h5 card-title mb-1">
+                                                    <a href="/topic.php?id=<?= $topic['id'] ?>" class="text-decoration-none">
+                                                        <?= htmlspecialchars($topic['title']) ?>
+                                                    </a>
+                                                </h2>
+                                                <?php if ($topic['category_name']): ?>
+                                                <a href="/?category=<?= $topic['category_id'] ?>" class="badge bg-primary text-decoration-none">
+                                                    <?= htmlspecialchars($topic['category_name']) ?>
+                                                </a>
+                                                <?php endif; ?>
+                                            </div>
+                                            <div class="dropdown">
+                                                <button class="btn btn-link text-muted p-0" data-bs-toggle="dropdown">
+                                                    <i class="bi bi-three-dots-vertical"></i>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end">
+                                                    <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $topic['user_id']): ?>
+                                                    <li>
+                                                        <a class="dropdown-item" href="/edit-topic.php?id=<?= $topic['id'] ?>">
+                                                            <i class="bi bi-pencil me-2"></i> Düzenle
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <button class="dropdown-item text-danger" 
+                                                                onclick="deleteTopic(<?= $topic['id'] ?>)">
+                                                            <i class="bi bi-trash me-2"></i> Sil
+                                                        </button>
+                                                    </li>
+                                                    <?php endif; ?>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="d-flex align-items-center gap-3 mt-2">
+                                            <button class="btn btn-sm btn-link text-muted p-0" 
+                                                    onclick="likeTopic(<?= $topic['id'] ?>)">
+                                                <i class="bi bi-heart<?= $topic['is_liked'] ? '-fill text-danger' : '' ?>"></i>
+                                                <span class="ms-1"><?= $topic['like_count'] ?></span>
+                                            </button>
+                                            
+                                            <a href="/topic.php?id=<?= $topic['id'] ?>#comments" 
+                                               class="btn btn-sm btn-link text-muted p-0">
+                                                <i class="bi bi-chat"></i>
+                                                <span class="ms-1"><?= $topic['comment_count'] ?></span>
                                             </a>
-                                        </li>
-                                        <li>
-                                            <button class="dropdown-item text-danger" 
-                                                    onclick="deleteTopic(<?= $topic['id'] ?>)">
-                                                <i class="bi bi-trash me-2"></i> Sil
+                                            
+                                            <button class="btn btn-sm btn-link text-muted p-0" 
+                                                    onclick="bookmarkTopic(<?= $topic['id'] ?>)">
+                                                <i class="bi bi-bookmark<?= $topic['is_bookmarked'] ? '-fill text-primary' : '' ?>"></i>
                                             </button>
-                                        </li>
-                                        <?php endif; ?>
-                                        <li>
-                                            <button class="dropdown-item" 
-                                                    onclick="reportTopic(<?= $topic['id'] ?>)">
-                                                <i class="bi bi-flag me-2"></i> Şikayet Et
-                                            </button>
-                                        </li>
-                                        <li>
-                                            <button class="dropdown-item" 
-                                                    onclick="shareTopic(<?= $topic['id'] ?>)">
-                                                <i class="bi bi-share me-2"></i> Paylaş
-                                            </button>
-                                        </li>
-                                    </ul>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            
-                            <div class="d-flex align-items-center text-muted small mb-2">
-                                <a href="/profile.php?username=<?= htmlspecialchars($topic['username']) ?>" 
-                                   class="text-decoration-none me-2">
-                                    @<?= htmlspecialchars($topic['username']) ?>
-                                </a>
-                                <span class="me-2">•</span>
-                                <time datetime="<?= $topic['created_at'] ?>" class="timeago me-2">
-                                    <?= htmlspecialchars($topic['created_at']) ?>
-                                </time>
-                                <?php if ($topic['updated_at'] != $topic['created_at']): ?>
-                                <span class="me-2">•</span>
-                                <span class="text-muted" title="Son düzenleme: <?= htmlspecialchars($topic['updated_at']) ?>">
-                                    Düzenlendi
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+                
+                <!-- Sayfalama -->
+                <?php if ($total_pages > 1): ?>
+                <nav class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                        <li class="page-item <?= $i == $page ? 'active' : '' ?>">
+                            <a class="page-link" href="?page=<?= $i ?><?= $categoryId ? '&category=' . $categoryId : '' ?><?= $tagSlug ? '&tag=' . urlencode($tagSlug) : '' ?>">
+                                <?= $i ?>
+                            </a>
+                        </li>
+                        <?php endfor; ?>
+                    </ul>
+                </nav>
+                <?php endif; ?>
+            </div>
+
+            <!-- Yan Panel -->
+            <div class="col-lg-4">
+                <!-- Kategoriler -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h3 class="h5 mb-3">Kategoriler</h3>
+                        <div class="list-group list-group-flush">
+                            <a href="/" class="list-group-item list-group-item-action <?= !$categoryId ? 'active' : '' ?>">
+                                Tüm Konular
+                            </a>
+                            <?php foreach ($categories as $category): ?>
+                            <a href="/?category=<?= $category['id'] ?>" 
+                               class="list-group-item list-group-item-action <?= $categoryId == $category['id'] ? 'active' : '' ?>">
+                                <?= htmlspecialchars($category['name']) ?>
+                                <span class="badge bg-secondary float-end">
+                                    <?= $categoryManager->getCategoryTopicCount($category['id']) ?>
                                 </span>
-                                <?php endif; ?>
-                            </div>
-                            
-                            <p class="card-text mb-3">
-                                <?= nl2br(htmlspecialchars(mb_substr($topic['content'], 0, 300))) ?>
-                                <?php if (mb_strlen($topic['content']) > 300): ?>
-                                <a href="/topic.php?id=<?= $topic['id'] ?>" class="text-decoration-none">devamını oku...</a>
-                                <?php endif; ?>
-                            </p>
-                            
-                            <!-- Etkileşim Butonları -->
-                            <div class="d-flex align-items-center gap-3">
-                                <button class="btn btn-sm btn-link text-muted p-0" 
-                                        onclick="likeTopic(<?= $topic['id'] ?>)">
-                                    <i class="bi bi-heart<?= $topic['is_liked'] ? '-fill text-danger' : '' ?>"></i>
-                                    <span class="ms-1"><?= $topic['like_count'] ?></span>
-                                </button>
-                                
-                                <a href="/topic.php?id=<?= $topic['id'] ?>#comments" 
-                                   class="btn btn-sm btn-link text-muted p-0">
-                                    <i class="bi bi-chat"></i>
-                                    <span class="ms-1"><?= $topic['comment_count'] ?></span>
-                                </a>
-                                
-                                <button class="btn btn-sm btn-link text-muted p-0" 
-                                        onclick="bookmarkTopic(<?= $topic['id'] ?>)">
-                                    <i class="bi bi-bookmark<?= $topic['is_bookmarked'] ? '-fill text-primary' : '' ?>"></i>
-                                </button>
-                            </div>
+                            </a>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Popüler Etiketler -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h3 class="h5 mb-3">Popüler Etiketler</h3>
+                        <div class="d-flex flex-wrap gap-2">
+                            <?php foreach ($popularTags as $tag): ?>
+                            <a href="/?tag=<?= urlencode($tag['slug']) ?>" 
+                               class="badge bg-secondary text-decoration-none <?= $tagSlug == $tag['slug'] ? 'bg-primary' : '' ?>">
+                                #<?= htmlspecialchars($tag['name']) ?>
+                                <span class="badge bg-light text-dark ms-1"><?= $tag['usage_count'] ?></span>
+                            </a>
+                            <?php endforeach; ?>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <?php endforeach; ?>
-    </div>
-    
-    <!-- Sayfalama -->
-    <?php if ($total_pages > 1): ?>
-    <nav class="mt-4" aria-label="Sayfalama">
-        <ul class="pagination justify-content-center">
-            <?php if ($page > 1): ?>
-            <li class="page-item">
-                <a class="page-link" href="?page=<?= $page - 1 ?>" aria-label="Önceki">
-                    <i class="bi bi-chevron-left"></i>
-                </a>
-            </li>
-            <?php endif; ?>
-            
-            <?php
-            $start_page = max(1, $page - 2);
-            $end_page = min($total_pages, $page + 2);
-            
-            if ($start_page > 1) {
-                echo '<li class="page-item"><a class="page-link" href="?page=1">1</a></li>';
-                if ($start_page > 2) {
-                    echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
-                }
-            }
-            
-            for ($i = $start_page; $i <= $end_page; $i++) {
-                echo '<li class="page-item' . ($i == $page ? ' active' : '') . '">';
-                echo '<a class="page-link" href="?page=' . $i . '">' . $i . '</a>';
-                echo '</li>';
-            }
-            
-            if ($end_page < $total_pages) {
-                if ($end_page < $total_pages - 1) {
-                    echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
-                }
-                echo '<li class="page-item"><a class="page-link" href="?page=' . $total_pages . '">' . $total_pages . '</a></li>';
-            }
-            ?>
-            
-            <?php if ($page < $total_pages): ?>
-            <li class="page-item">
-                <a class="page-link" href="?page=<?= $page + 1 ?>" aria-label="Sonraki">
-                    <i class="bi bi-chevron-right"></i>
-                </a>
-            </li>
-            <?php endif; ?>
-        </ul>
-    </nav>
-    <?php endif; ?>
-</main>
+    </main>
+
+    <?php include __DIR__ . '/../includes/footer.php'; ?>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="<?= $assets['js'] ?>"></script>
+</body>
+</html>
 
 <script>
 // Timeago.js kütüphanesini kullanarak tarihleri formatla
@@ -418,6 +420,4 @@ async function submitReport(event) {
         alert('Bir hata oluştu');
     }
 }
-</script>
-
-<?php require_once '../includes/footer.php'; ?> 
+</script> 

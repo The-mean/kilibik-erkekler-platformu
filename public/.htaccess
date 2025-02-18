@@ -92,4 +92,25 @@ Header set Permissions-Policy "geolocation=(), microphone=(), camera=()"
 # Hata sayfaları
 ErrorDocument 404 /404.php
 ErrorDocument 403 /403.php
-ErrorDocument 500 /500.php 
+ErrorDocument 500 /500.php
+
+# PHP hata gösterimini kapat
+php_flag display_errors off
+php_value error_reporting 0
+
+# Dizin listelemeyi kapat
+IndexIgnore *
+
+# Büyük dosyaları parçalı gönder
+<IfModule mod_headers.c>
+    Header set Accept-Ranges bytes
+</IfModule>
+
+# PHP güvenlik ayarları
+<IfModule mod_php7.c>
+    php_value session.cookie_httponly 1
+    php_value session.cookie_secure 1
+    php_value session.use_only_cookies 1
+    php_value session.use_strict_mode 1
+    php_value session.cookie_samesite "Lax"
+</IfModule> 

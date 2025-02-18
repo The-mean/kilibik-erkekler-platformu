@@ -29,7 +29,7 @@ class RateLimiter {
             "SELECT COUNT(*) as count FROM rate_limits 
             WHERE ip_address = :ip 
             AND action_type = :action 
-            AND strftime('%s', 'now') - strftime('%s', last_request) < :window",
+            AND UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(last_request) < :window",
             [
                 ':ip' => $ip,
                 ':action' => $action,
@@ -70,7 +70,7 @@ class RateLimiter {
             "SELECT COUNT(*) as count FROM rate_limits 
             WHERE ip_address = :ip 
             AND action_type = :action 
-            AND strftime('%s', 'now') - strftime('%s', last_request) < :window",
+            AND UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(last_request) < :window",
             [
                 ':ip' => $ip,
                 ':action' => $action,

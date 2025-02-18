@@ -8,17 +8,58 @@ $adManager = new AdManager($auth);
 // Varsayılan meta bilgileri
 $defaultMeta = [
     'title' => 'Kılıbık Erkekler Platformu',
-    'description' => 'Kılıbık erkeklerin buluşma noktası. Deneyimlerinizi paylaşın, başkalarının hikayelerini okuyun.',
-    'image' => 'https://kilibikerkekler.com/assets/images/og-image.jpg',
+    'description' => 'Türkiye\'nin en büyük kılıbık erkekler topluluğu. Deneyimlerinizi paylaşın, başkalarının hikayelerini okuyun.',
+    'keywords' => 'kılıbık erkekler, ilişki, deneyim paylaşımı, sosyal platform',
+    'image' => '/assets/images/og-image.jpg',
     'type' => 'website',
-    'url' => 'https://kilibikerkekler.com'
+    'robots' => 'index, follow'
 ];
 
 // Sayfa başlığı ve meta bilgilerini ayarla
 function setPageMeta($meta = []) {
-    global $defaultMeta;
-    $meta = array_merge($defaultMeta, $meta);
-    return $meta;
+    $defaults = [
+        'title' => 'Kılıbık Erkekler Platformu',
+        'description' => 'Türkiye\'nin en büyük kılıbık erkekler topluluğu. Deneyimlerinizi paylaşın, başkalarının hikayelerini okuyun.',
+        'keywords' => 'kılıbık erkekler, ilişki, deneyim paylaşımı, sosyal platform',
+        'image' => '/assets/images/og-image.jpg',
+        'type' => 'website',
+        'robots' => 'index, follow'
+    ];
+
+    $meta = array_merge($defaults, $meta);
+    
+    // Temel meta etiketleri
+    echo '<title>' . Security::sanitizeHTML($meta['title']) . '</title>';
+    echo '<meta name="description" content="' . Security::sanitizeHTML($meta['description']) . '">';
+    echo '<meta name="keywords" content="' . Security::sanitizeHTML($meta['keywords']) . '">';
+    echo '<meta name="robots" content="' . Security::sanitizeHTML($meta['robots']) . '">';
+    
+    // Open Graph meta etiketleri
+    echo '<meta property="og:title" content="' . Security::sanitizeHTML($meta['title']) . '">';
+    echo '<meta property="og:description" content="' . Security::sanitizeHTML($meta['description']) . '">';
+    echo '<meta property="og:image" content="' . Security::sanitizeURL($meta['image']) . '">';
+    echo '<meta property="og:type" content="' . Security::sanitizeHTML($meta['type']) . '">';
+    echo '<meta property="og:site_name" content="Kılıbık Erkekler Platformu">';
+    
+    // Twitter Card meta etiketleri
+    echo '<meta name="twitter:card" content="summary_large_image">';
+    echo '<meta name="twitter:title" content="' . Security::sanitizeHTML($meta['title']) . '">';
+    echo '<meta name="twitter:description" content="' . Security::sanitizeHTML($meta['description']) . '">';
+    echo '<meta name="twitter:image" content="' . Security::sanitizeURL($meta['image']) . '">';
+    
+    // Canonical URL
+    $canonical = isset($meta['canonical']) ? $meta['canonical'] : 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+    echo '<link rel="canonical" href="' . Security::sanitizeURL($canonical) . '">';
+    
+    // Diğer meta etiketleri
+    echo '<meta name="viewport" content="width=device-width, initial-scale=1.0">';
+    echo '<meta charset="UTF-8">';
+    echo '<meta http-equiv="X-UA-Compatible" content="IE=edge">';
+    
+    // Favicon
+    echo '<link rel="icon" type="image/png" href="/favicon.ico">';
+    echo '<link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.png">';
+    echo '<link rel="manifest" href="/site.webmanifest">';
 }
 
 // Başlık detaylarını al
